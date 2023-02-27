@@ -1,80 +1,80 @@
 const MORSE_TABLE = {
-    '.-':     'a',
-    '-...':   'b',
-    '-.-.':   'c',
-    '-..':    'd',
-    '.':      'e',
-    '..-.':   'f',
-    '--.':    'g',
-    '....':   'h',
-    '..':     'i',
-    '.---':   'j',
-    '-.-':    'k',
-    '.-..':   'l',
-    '--':     'm',
-    '-.':     'n',
-    '---':    'o',
-    '.--.':   'p',
-    '--.-':   'q',
-    '.-.':    'r',
-    '...':    's',
-    '-':      't',
-    '..-':    'u',
-    '...-':   'v',
-    '.--':    'w',
-    '-..-':   'x',
-    '-.--':   'y',
-    '--..':   'z',
-    '.----':  '1',
-    '..---':  '2',
-    '...--':  '3',
-    '....-':  '4',
-    '.....':  '5',
-    '-....':  '6',
-    '--...':  '7',
-    '---..':  '8',
-    '----.':  '9',
-    '-----':  '0',
+  '.-': 'a',
+  '-...': 'b',
+  '-.-.': 'c',
+  '-..': 'd',
+  '.': 'e',
+  '..-.': 'f',
+  '--.': 'g',
+  '....': 'h',
+  '..': 'i',
+  '.---': 'j',
+  '-.-': 'k',
+  '.-..': 'l',
+  '--': 'm',
+  '-.': 'n',
+  '---': 'o',
+  '.--.': 'p',
+  '--.-': 'q',
+  '.-.': 'r',
+  '...': 's',
+  '-': 't',
+  '..-': 'u',
+  '...-': 'v',
+  '.--': 'w',
+  '-..-': 'x',
+  '-.--': 'y',
+  '--..': 'z',
+  '.----': '1',
+  '..---': '2',
+  '...--': '3',
+  '....-': '4',
+  '.....': '5',
+  '-....': '6',
+  '--...': '7',
+  '---..': '8',
+  '----.': '9',
+  '-----': '0',
 };
 
-function decode(expr) {
-    let morse = '';
-    let res = '';
-    let arr = expr.split('');
+// split binary word to binary letters 
+const SplitIntoLetters = function (word) {
+  let result = new Array();
+  while (word.length >= 10) {
+    result.push(word.splice(0, 10));
+  }
+  return result;
+}
 
-    for(let i = 0; i<arr.length; i++) {
-        if(arr[i] == ' ') {
-            res += '**********';
-            continue;
-        }
-        for(key in MORSE_TABLE) {
-            if(MORSE_TABLE[key] == arr[i]){
-                morse += key;
+// remove zero from begin of binaty letter
+const RemoveZeroFromBegin = function (word) {
+  while (word.length > 0 && Number(word[0]) === 0) {
+    word.shift();
+  }
+}
 
-                let numArr = morse.split('').map(e => e === '-' ? '11' : e === '.' ? '10' : null).join('')
+// change numbers to dot or dash
+const MorseFromNumbers = function (word) {
+  let result = new Array();
+  RemoveZeroFromBegin(word);
 
-                if(numArr.length < 10){
-                    let a = 10 - numArr.length;
+  while (word.length > 0) {
+    result.push(word.splice(0, 2).join("") === "10" ? "." : "-");
+    RemoveZeroFromBegin(word);
+  }
+  return result.join("");
+}
 
-                    for(let k = 0; k<a; k++){
-                        numArr = '0' + numArr;
-                    }
-                
-                }
-
-                res += numArr;
-                numArr = '';
-                morse = '';
-                
-            }
-        }
-    }
-
-    
-
-    return res;
+////////////////////////////////////////////////////////////
+function decode(line) {
+  return line.split("**********")
+    .map((word) => SplitIntoLetters(Array.from(word)))                                // split string into words
+    .map((splited_word) => splited_word.map(char => MorseFromNumbers(char)))          // split words into characters (morse format)
+    .map((splited_word) => splited_word.map(char => MORSE_TABLE[char]))               // get letter from morse code
+    .map(chars => chars.join(""))                                                     // join letters to word
+    .join(" ");                                                                       // join words to string
 }
 
 module.exports = {
-    decode
+  decode
 }
